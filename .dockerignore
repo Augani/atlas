@@ -1,0 +1,11 @@
+target/
+node_modules/
+test-data/
+data/
+.env
+.git/
+*.pmtiles
+docs/
+scripts/
+CONTRIBUTING.md
+LICENSE

@@ -1,0 +1,27 @@
+services:
+  atlas:
+    build: .
+    ports:
+      - "${ATLAS_EXTERNAL_PORT:-8080}:80"
+    volumes:
+      - ${ATLAS_DATA_DIR:-./test-data}:/data:ro
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - ATLAS_TILE_SOURCE=local
+      - ATLAS_TILE_DIR=/data
+      - ATLAS_GEOCODE_INDEX_DIR=/data/geocode-index
+      - ATLAS_LANDMARK_PATH=/data/landmarks.bin
+      - ATLAS_PLACES_PATH=/data/places.bin
+      - ATLAS_SEARCH_INDEX_DIR=/data/search-index
+      - ATLAS_ROUTE_DIR=/data
+      - ATLAS_OSM_DIR=/data/osm
+      - ATLAS_PUBLIC_URL=${ATLAS_PUBLIC_URL:-http://localhost:8080}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
