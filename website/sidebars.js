@@ -25,6 +25,8 @@ const sidebars = {
         'sdk/nextjs',
         'sdk/react-native',
         'sdk/flutter',
+        'sdk/kotlin',
+        'sdk/swift',
       ],
     },
     'self-hosting',
