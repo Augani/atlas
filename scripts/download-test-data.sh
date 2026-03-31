@@ -9,7 +9,24 @@ if [ -f "$DEST/accra.pmtiles" ]; then
     echo "test-data/accra.pmtiles already exists, skipping"
 else
     echo "Downloading Accra area PMTiles extract..."
-    PLANET_URL="https://build.protomaps.com/20260315.pmtiles"
+
+    # Find the latest available Protomaps daily build (try up to 7 days back)
+    PLANET_URL=""
+    for i in 0 1 2 3 4 5 6; do
+        CANDIDATE_DATE=$(date -v -${i}d +"%Y%m%d" 2>/dev/null || date -d "-${i} days" +"%Y%m%d")
+        CANDIDATE_URL="https://build.protomaps.com/${CANDIDATE_DATE}.pmtiles"
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" --head "$CANDIDATE_URL")
+        if [ "$STATUS" = "200" ]; then
+            PLANET_URL="$CANDIDATE_URL"
+            echo "Using build: $PLANET_URL"
+            break
+        fi
+    done
+
+    if [ -z "$PLANET_URL" ]; then
+        echo "Error: could not find a recent Protomaps build. Check https://maps.protomaps.com/builds/"
+        exit 1
+    fi
 
     if command -v pmtiles &> /dev/null; then
         pmtiles extract "$PLANET_URL" "$DEST/accra.pmtiles" \
